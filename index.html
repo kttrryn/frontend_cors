@@ -3,18 +3,131 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Beauli - Каталог</title>
+  <title>Beauli Cosmetics - Client</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Beauli Cosmetics Catalog</h1>
-    <p>Демонстрація інтеграції Frontend та API через CORS</p>
+
+  <!-- Навігаційна панель -->
+  <header class="navbar">
+    <div class="logo" onclick="navigateTo('catalog')">Beauli Store</div>
+    <nav class="nav-links">
+      <button class="nav-btn" onclick="navigateTo('catalog')">Каталог (Публічний)</button>
+      <button class="nav-btn" onclick="navigateTo('admin-panel')">Управління (Тільки для авторизованих)</button>
+    </nav>
+    <div class="auth-controls">
+      <!-- Для неавторизованого -->
+      <div id="guest-zone">
+        <button class="btn btn-outline" onclick="navigateTo('login')">Вхід</button>
+        <button class="btn btn-primary" onclick="navigateTo('register')">Реєстрація</button>
+      </div>
+      <!-- Для авторизованого -->
+      <div id="user-zone" style="display: none;">
+        <span id="user-display">Привіт, <strong id="username-val"></strong></span>
+        <button class="btn btn-danger" onclick="logout()">Вийти</button>
+      </div>
+    </div>
   </header>
 
-  <main>
-    <div id="status" class="loading">Завантаження товарів...</div>
-    <div id="products-grid" class="grid"></div>
+  <main class="container">
+    <div id="alert-box" class="alert" style="display: none;"></div>
+
+    <!-- 1. Публічна сторінка: Каталог -->
+    <section id="view-catalog" class="page-view">
+      <h2>Каталог косметики</h2>
+      <p class="subtitle">Ця сторінка доступна всім користувачам без авторизації.</p>
+      <div id="catalog-status" class="loading">Завантаження каталогу...</div>
+      <div id="products-grid" class="grid"></div>
+    </section>
+
+    <!-- 2. Захищена сторінка: Додавання товару / Управління -->
+    <section id="view-admin-panel" class="page-view" style="display: none;">
+      <h2>Панель додавання товару</h2>
+      <p class="subtitle">Цей функціонал доступний виключно авторизованим користувачам.</p>
+      <div class="card form-card">
+        <form id="create-product-form" onsubmit="handleCreateProduct(event)">
+          <div class="form-group">
+            <label>Артикул (SKU):</label>
+            <input type="text" id="p-sku" required placeholder="LIP-001">
+          </div>
+          <div class="form-group">
+            <label>Назва товару:</label>
+            <input type="text" id="p-name" required placeholder="Matte Lipstick">
+          </div>
+          <div class="form-group">
+            <label>Опис:</label>
+            <textarea id="p-desc" rows="2" placeholder="Опис товару..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Ціна (грн):</label>
+            <input type="number" step="0.01" id="p-price" required placeholder="450.00">
+          </div>
+          <div class="form-group">
+            <label>ID Бренду:</label>
+            <input type="number" id="p-brand" required placeholder="1">
+          </div>
+          <div class="form-group">
+            <label>ID Категорії:</label>
+            <input type="number" id="p-category" required placeholder="1">
+          </div>
+          <button type="submit" class="btn btn-primary full-width">Створити товар</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 3. Сторінка логіну -->
+    <section id="view-login" class="page-view" style="display: none;">
+      <div class="card auth-card">
+        <h2>Вхід до системи</h2>
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label>Username:</label>
+            <input type="text" id="login-username" required>
+          </div>
+          <div class="form-group">
+            <label>Пароль:</label>
+            <input type="password" id="login-password" required>
+          </div>
+          <button type="submit" class="btn btn-primary full-width">Увійти</button>
+        </form>
+        <p class="switch-link">Ще немає акаунту? <a href="#" onclick="navigateTo('register')">Зареєструватися</a></p>
+      </div>
+    </section>
+
+    <!-- 4. Сторінка реєстрації -->
+    <section id="view-register" class="page-view" style="display: none;">
+      <div class="card auth-card">
+        <h2>Реєстрація</h2>
+        <form id="register-form" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label>Username *:</label>
+            <input type="text" id="reg-username" required maxlength="150">
+          </div>
+          <div class="form-group">
+            <label>Ім'я:</label>
+            <input type="text" id="reg-firstname" maxlength="150">
+          </div>
+          <div class="form-group">
+            <label>Прізвище:</label>
+            <input type="text" id="reg-lastname" maxlength="150">
+          </div>
+          <div class="form-group">
+            <label>Email *:</label>
+            <input type="email" id="reg-email" required>
+          </div>
+          <div class="form-group">
+            <label>Пароль *:</label>
+            <input type="password" id="reg-password" required minlength="8">
+          </div>
+          <div class="form-group">
+            <label>Підтвердження пароля *:</label>
+            <input type="password" id="reg-password-confirm" required minlength="8">
+          </div>
+          <button type="submit" class="btn btn-primary full-width">Зареєструватися</button>
+        </form>
+        <p class="switch-link">Вже зареєстровані? <a href="#" onclick="navigateTo('login')">Увійти</a></p>
+      </div>
+    </section>
   </main>
 
   <script src="app.js"></script>
